@@ -33,7 +33,7 @@
         trackingResults.appendChild(document.createTextNode(' Hat folgende Resultate ergeben:'))
         
         const responseMessage = document.createElement('p')
-        responseMessage.innerText = resJson.data
+        responseMessage.innerText = resJson.data || resJson.error
         trackingResults.appendChild(responseMessage)
     })
 })()
