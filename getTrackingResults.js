@@ -1,19 +1,18 @@
 (async function homePage() {
-    const trackingBtn = document.getElementById('tracking-search-btn')
-    console.log('btn', trackingBtn)
+    const trackingForm = document.getElementById('tracking-form')
     const trackingResults = document.getElementById('tracking-search-results')
-    console.log('resultdiv', trackingResults)
     
-    trackingBtn.addEventListener("click", async (event) => {
+    trackingForm.addEventListener("submit", async (event) => {
         event.preventDefault()
+        trackingForm.checkValidity()
         trackingResults.innerHTML = '... loading ...'
         
         const trackingInput = document.getElementById('tracking-search-input')
-        console.log('inputfield', trackingInput)
 
         const localBaseUrl = 'http://localhost:5000/api/tracking/'
         const remoteBaseUrl = 'https://ruspost.herokuapp.com/api/tracking/'
-        const baseUrl = typeof Webflow === 'undefined' ? localBaseUrl : remoteBaseUrl
+        const isLocalEnv = location.hostname === '' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+        const baseUrl = isLocalEnv ? localBaseUrl : remoteBaseUrl
         const requestUrl = baseUrl + trackingInput.value
         const response = await fetch(requestUrl, {
             method: 'GET',
@@ -22,8 +21,8 @@
             redirect: 'follow',
             referrerPolicy: 'no-referrer',
         })
-        console.log('res', response)
         const resJson = await response.json()
+        console.log('res', response)
         console.log('json',resJson)
 
         trackingResults.innerHTML = ''
