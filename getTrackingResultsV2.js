@@ -1,4 +1,7 @@
 (async function homePage() {
+    // preset tracking ID for testing
+    document.getElementById('tracking-search-input').value = 'RA644000005RU'
+
     const trackingForm = document.getElementById('tracking-form')
     console.log(trackingForm)
     const trackingContainerTemplate = document.getElementById('tracking-container-template')
@@ -13,6 +16,7 @@
     const loaderContainer = document.getElementById('loader-container')
     const checkIconUrl = 'https://assets.website-files.com/5ef2311c8f2d5d28a241aa82/5fb787fedb3f051ba17f7ccc_tick.svg'
     const prohibitionIconUrl = 'https://assets.website-files.com/5ef2311c8f2d5d28a241aa82/5fb24af8dc26867ddea1a367_prohibition.svg'
+    const packageIconUrl = 'https://uploads-ssl.webflow.com/5ef2311c8f2d5d28a241aa82/5f0ddd58de790955cac7b116_part2.PNG'
     
     trackingForm.addEventListener("submit", async (event) => {
         event.preventDefault()
@@ -47,6 +51,17 @@
         loaderContainer.style.display = 'none'
         
         if (resJson.data) {
+            /** Handle Russian Post Tracking API operation details:
+
+             https://tracking.pochta.ru/support/dictionaries/operation_codes
+
+             From the docs:
+             Note: for some operations, which require the attribute,
+             API of shipment tracking may return attribute value of 0.
+             The Client should interprete such attribute value as the absence of information on the attribute.
+             This rule has only one exception: operation 8 (processing), which has attribute 0 (Sorting) as normal.
+            */
+
             trackingContainerTemplate.querySelector('#tracking-detail-headline').innerText = 'Delivery from Berlin to Moscow'
 
             const newTrackingItem = trackingItemTemplate.cloneNode(deep=true)
@@ -71,4 +86,8 @@
             formFailContainer.style.display = 'block'
         }
     })
+
+    function getIconUrl(operTypeId) {
+      return 'afd'
+    }
 })()
