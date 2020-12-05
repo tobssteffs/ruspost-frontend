@@ -16,94 +16,104 @@
     const loaderContainer = document.getElementById('loader-container')
     
     trackingForm.addEventListener("submit", async (event) => {
-        event.preventDefault()
-        trackingForm.checkValidity()
+      try {
+          event.preventDefault()
+          trackingForm.checkValidity()
 
-        // resets in case there was already a tracking number searched for
-        formFailContainer.style.display = 'none'
-        trackingContainerTemplate.style.display = 'none'
-        trackingItems.innerHTML = ''
+          // resets in case there was already a tracking number searched for
+          formFailContainer.style.display = 'none'
+          trackingContainerTemplate.style.display = 'none'
+          trackingItems.innerHTML = ''
 
-        loaderContainer.style.display = 'flex'
-        
-        const trackingInput = document.getElementById('tracking-search-input')
+          loaderContainer.style.display = 'flex'
 
-        const localBaseUrl = 'http://localhost:5000/api/tracking/'
-        const remoteBaseUrl = 'https://ruspost.herokuapp.com/api/tracking/'
-        const isLocalEnv = location.hostname === '' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'
-        const baseUrl = isLocalEnv ? localBaseUrl : remoteBaseUrl
-        const requestUrl = baseUrl + trackingInput.value
-        console.log('start request')
-        const response = await fetch(requestUrl, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'no-cache',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer',
-        })
-        const resJson = await response.json()
-        console.log('res', response)
-        console.log('json',resJson)
+          const trackingInput = document.getElementById('tracking-search-input')
 
-        const trackingOperations = resJson.tracking_operations
-        if (Array.isArray(trackingOperations) && trackingOperations.length) {
-            /** Handle Russian Post Tracking API operation details:
-            *
-            * https://tracking.pochta.ru/support/dictionaries/operation_codes
-            *
-            * From the docs:
-            * Note: for some operations, which require the attribute,
-            * API of shipment tracking may return attribute value of 0.
-            * The Client should interprete such attribute value as the absence of information on the attribute.
-            * This rule has only one exception: operation 8 (processing), which has attribute 0 (Sorting) as normal.
-            */
+          const localBaseUrl = 'http://localhost:5000/api/tracking/'
+          const remoteBaseUrl = 'https://ruspost.herokuapp.com/api/tracking/'
+          const isLocalEnv = location.hostname === '' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+          const baseUrl = isLocalEnv ? localBaseUrl : remoteBaseUrl
+          const requestUrl = baseUrl + trackingInput.value
+          console.log('start request')
+          const response = await fetch(requestUrl, {
+              method: 'GET',
+              mode: 'cors',
+              cache: 'no-cache',
+              redirect: 'follow',
+              referrerPolicy: 'no-referrer',
+          })
+          const resJson = await response.json()
+          console.log('res', response)
+          console.log('json',resJson)
 
-            const deliveryToCountry = trackingOperations[0]['address_parameters']['MailDirect']['NameEN']
-            const deliveryToAddress = trackingOperations[0]['address_parameters']['DestinationAddress']['Description']
-            const deliveryFromCountry = trackingOperations[0]['address_parameters']['CountryOper']['NameEN']
-            const deliveryFromAddress = trackingOperations[0]['address_parameters']['OperationAddress']['Description']
-            const currentLocationCountry = trackingOperations[trackingOperations.length - 1]['address_parameters']['CountryOper']['NameEN']
-            // set general info
-            trackingContainerTemplate.querySelector('#tracking-detail-headline').innerText = `Delivery from ${deliveryFromCountry} to ${deliveryToCountry}`
-            trackingContainerTemplate.querySelector('#tracking-detail-subheadline').innerText = trackingSearchValue
-            trackingContainerTemplate.querySelector('#tracking-detail-bottom-from-info').innerText = `From: ${[deliveryFromCountry, deliveryFromAddress].filter(val => val).join(', ')}`
-            trackingContainerTemplate.querySelector('#tracking-detail-bottom-to-info').innerText = `To: ${[deliveryToCountry, deliveryToAddress].filter(val => val).join(', ')}`
-            trackingContainerTemplate.querySelector('#tracking-detail-bottom-location-info').innerText = `Current location: ${currentLocationCountry}`
+          const trackingOperations = resJson.tracking_operations
+          if (Array.isArray(trackingOperations) && trackingOperations.length) {
+              /** Handle Russian Post Tracking API operation details:
+              *
+              * https://tracking.pochta.ru/support/dictionaries/operation_codes
+              *
+              * From the docs:
+              * Note: for some operations, which require the attribute,
+              * API of shipment tracking may return attribute value of 0.
+              * The Client should interprete such attribute value as the absence of information on the attribute.
+              * This rule has only one exception: operation 8 (processing), which has attribute 0 (Sorting) as normal.
+              */
 
-            // set tracking items
-            for (const operation of trackingOperations) {
-              const newTrackingItem = trackingItemTemplate.cloneNode(deep=true)
+              const deliveryToCountry = trackingOperations[0]['address_parameters']['MailDirect']['NameEN']
+              const deliveryToAddress = trackingOperations[0]['address_parameters']['DestinationAddress']['Description']
+              const deliveryFromCountry = trackingOperations[0]['address_parameters']['CountryOper']['NameEN']
+              const deliveryFromAddress = trackingOperations[0]['address_parameters']['OperationAddress']['Description']
+              const currentLocationCountry = trackingOperations[trackingOperations.length - 1]['address_parameters']['CountryOper']['NameEN']
+              // set general info
+              trackingContainerTemplate.querySelector('#tracking-detail-headline').innerText = `Delivery from ${deliveryFromCountry} to ${deliveryToCountry}`
+              trackingContainerTemplate.querySelector('#tracking-detail-subheadline').innerText = trackingSearchValue
+              trackingContainerTemplate.querySelector('#tracking-detail-bottom-from-info').innerText = `From: ${[deliveryFromCountry, deliveryFromAddress].filter(val => val).join(', ')}`
+              trackingContainerTemplate.querySelector('#tracking-detail-bottom-to-info').innerText = `To: ${[deliveryToCountry, deliveryToAddress].filter(val => val).join(', ')}`
+              trackingContainerTemplate.querySelector('#tracking-detail-bottom-location-info').innerText = `Current location: ${currentLocationCountry}`
 
-              console.log(operation)
+              // set tracking items
+              for (const operation of trackingOperations) {
+                const newTrackingItem = trackingItemTemplate.cloneNode(deep=true)
 
-              const operationCountry = operation['address_parameters']['CountryOper']['NameEN']
-              const operationAddress = operation['address_parameters']['OperationAddress']['Description']
-              const operationDate = new Date(operation['operation_parameters']['OperDate'])
-              const operationName = operation['operation_parameters']['OperAttr']['Name']
-              const operationTypeId = operation['operation_parameters']['OperType']['Id']
+                console.log(operation)
 
-              newTrackingItem.removeAttribute('id')
-              newTrackingItem.querySelector('#tracking-item-icon').src = getIconUrl(operationTypeId)
-              newTrackingItem.querySelector('#tracking-item-headline').innerText = operationName
-              newTrackingItem.querySelector('#tracking-item-operation-location').innerText = `${[operationCountry, operationAddress].filter(val => val).join(', ')}`
-              newTrackingItem.querySelector('#tracking-item-operation-time').innerText = operationDate
+                const operationCountry = operation['address_parameters']['CountryOper']['NameEN']
+                const operationAddress = operation['address_parameters']['OperationAddress']['Description']
+                const operationDate = new Date(operation['operation_parameters']['OperDate'])
+                const operationName = operation['operation_parameters']['OperAttr']['Name']
+                const operationTypeId = operation['operation_parameters']['OperType']['Id']
 
-              trackingItems.appendChild(newTrackingItem)
-            }
+                newTrackingItem.removeAttribute('id')
+                newTrackingItem.querySelector('#tracking-item-icon').src = getIconUrl(operationTypeId)
+                newTrackingItem.querySelector('#tracking-item-headline').innerText = operationName
+                newTrackingItem.querySelector('#tracking-item-operation-location').innerText = `${[operationCountry, operationAddress].filter(val => val).join(', ')}`
+                newTrackingItem.querySelector('#tracking-item-operation-time').innerText = operationDate
 
-            loaderContainer.style.display = 'none'
-            trackingContainerTemplate.style.display = 'block'
+                trackingItems.appendChild(newTrackingItem)
+              }
 
-            console.log('success')
-        } else if (resJson.error) {
-            console.log('error json', resJson.error)
-            const formFailMessage = document.getElementById('tracking-form-fail-message')
+              loaderContainer.style.display = 'none'
+              trackingContainerTemplate.style.display = 'block'
 
-            formFailMessage.innerText = resJson.error
-            loaderContainer.style.display = 'none'
-            formFailContainer.style.display = 'block'
-        }
-        loaderContainer.style.display = 'none'
+              console.log('success')
+          } else if (resJson.error) {
+              console.error('error json', resJson.error)
+              const formFailMessage = document.getElementById('tracking-form-fail-message')
+
+              formFailMessage.innerText = resJson.error
+              loaderContainer.style.display = 'none'
+              formFailContainer.style.display = 'block'
+          }
+          loaderContainer.style.display = 'none'
+      } catch (e) {
+          console.error('unexpected error')
+          console.error(e)
+          const formFailMessage = document.getElementById('tracking-form-fail-message')
+
+          formFailMessage.innerText = 'Unerwarteter Fehler, bitte versuchen Sie es noch einmal oder wenden sich an den Support.'
+          loaderContainer.style.display = 'none'
+          formFailContainer.style.display = 'block'
+      }
     })
 
     /**
@@ -118,13 +128,5 @@
     }
     function getIconUrl(operTypeId) {
       return operationTypeIdToIconUrlMapping[operTypeId] ? operationTypeIdToIconUrlMapping[operTypeId] : packageIconUrl
-    }
-
-    function getSafe(fn, defaultVal) {
-      try {
-        return fn();
-      } catch (e) {
-        return defaultVal;
-      }
     }
 })()
