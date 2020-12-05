@@ -110,7 +110,7 @@
           console.error(e)
           const formFailMessage = document.getElementById('tracking-form-fail-message')
 
-          formFailMessage.innerText = 'Unerwarteter Fehler, bitte versuchen Sie es noch einmal oder wenden sich an den Support.'
+          formFailMessage.innerText = 'Unerwarteter Fehler, bitte versuchen Sie es noch einmal, deaktivieren Sie Ihren Adblocker oder wenden sich an den Support.'
           loaderContainer.style.display = 'none'
           formFailContainer.style.display = 'block'
       }
