@@ -79,7 +79,7 @@
 
                 const operationCountry = operation['address_parameters']['CountryOper']['NameEN']
                 const operationAddress = operation['address_parameters']['OperationAddress']['Description']
-                const operationDate = new Date(operation['operation_parameters']['OperDate'])
+                const formattedDateTime = getFormattedDate(operation['operation_parameters']['OperDate'])
                 const operationName = operation['operation_parameters']['OperAttr']['Name']
                 const operationTypeId = operation['operation_parameters']['OperType']['Id']
 
@@ -87,7 +87,7 @@
                 newTrackingItem.querySelector('#tracking-item-icon').src = getIconUrl(operationTypeId)
                 newTrackingItem.querySelector('#tracking-item-headline').innerText = operationName
                 newTrackingItem.querySelector('#tracking-item-operation-location').innerText = `${[operationCountry, operationAddress].filter(val => val).join(', ')}`
-                newTrackingItem.querySelector('#tracking-item-operation-time').innerText = operationDate
+                newTrackingItem.querySelector('#tracking-item-operation-time').innerText = formattedDateTime
 
                 trackingItems.appendChild(newTrackingItem)
               }
@@ -128,5 +128,12 @@
     }
     function getIconUrl(operTypeId) {
       return operationTypeIdToIconUrlMapping[operTypeId] ? operationTypeIdToIconUrlMapping[operTypeId] : packageIconUrl
+    }
+    function getFormattedDate(date) {
+      let operationDate = new Date(date)
+      const day = (operationDate.getDate() < 10? '0' : '') + operationDate.getDate()
+      const month = (operationDate.getMonth() < 10? '0' : '') + operationDate.getMonth()
+      const formattedDate = `${day}.${month}.${operationDate.getFullYear()}`
+      return `${formattedDate}, ${operationDate.toTimeString().substr(0,5)}`
     }
 })()
