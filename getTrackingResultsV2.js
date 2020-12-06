@@ -72,6 +72,7 @@
               trackingContainerTemplate.querySelector('#tracking-detail-bottom-location-info').innerText = `Current location: ${currentLocationCountry}`
 
               // set tracking items
+              let lastWasMinimalInfo = false
               for (const operation of trackingOperations) {
                 const newTrackingItem = trackingItemTemplate.cloneNode(deep=true)
 
@@ -82,12 +83,24 @@
                 const formattedDateTime = getFormattedDate(operation['operation_parameters']['OperDate'])
                 const operationName = operation['operation_parameters']['OperAttr']['Name']
                 const operationTypeId = operation['operation_parameters']['OperType']['Id']
+                const operationTypeName = operation['operation_parameters']['OperType']['Name']
 
                 newTrackingItem.removeAttribute('id')
                 newTrackingItem.querySelector('#tracking-item-icon').src = getIconUrl(operationTypeId)
-                newTrackingItem.querySelector('#tracking-item-headline').innerText = operationName
+                let headline, newLastMinimal;
+                [headline, newLastMinimal] = getTrackingItemHeadline(operationTypeId, lastWasMinimalInfo, operationTypeName, operationName)
+                if (headline && !lastWasMinimalInfo && lastWasMinimalInfo !== newLastMinimal) {
+                  lastWasMinimalInfo = newLastMinimal
+                  newTrackingItem.querySelector('#tracking-item-headline').innerText = headline
+                } else if (headline && !newLastMinimal) {
+                  lastWasMinimalInfo = newLastMinimal
+                  newTrackingItem.querySelector('#tracking-item-headline').innerText = headline
+                } else {
+                  lastWasMinimalInfo = newLastMinimal
+                  continue
+                }
                 newTrackingItem.querySelector('#tracking-item-operation-location').innerText = `${[operationCountry, operationAddress].filter(val => val).join(', ')}`
-                newTrackingItem.querySelector('#tracking-item-operation-time').innerText = formattedDateTime
+                newTrackingItem.querySelector('#tracking-item-operation-time').innerText = formattedDateTime + " - code: " + operationTypeId
 
                 trackingItems.appendChild(newTrackingItem)
               }
@@ -124,6 +137,7 @@
     const packageIconUrl = 'https://uploads-ssl.webflow.com/5ef2311c8f2d5d28a241aa82/5f0ddd58de790955cac7b116_part2.PNG'
     const operationTypeIdToIconUrlMapping = {
       1: checkIconUrl,
+      2: checkIconUrl,
       12: prohibitionIconUrl,
     }
     function getIconUrl(operTypeId) {
@@ -135,5 +149,25 @@
       const month = (operationDate.getMonth() < 10? '0' : '') + operationDate.getMonth()
       const formattedDate = `${day}.${month}.${operationDate.getFullYear()}`
       return `${formattedDate}, ${operationDate.toTimeString().substr(0,5)}`
+    }
+
+    const minimalInfoCodesFilter = {
+      8: 'In transit to the next station',
+      9: 'In transit to the next station',
+      10: 'In transit to the next station',
+      11: 'In transit to the next station',
+      14: 'In transit to the next station'
+    }
+    function getTrackingItemHeadline(operTypeId, lastMinimal, operTypeName, operName) {
+      if (minimalInfoCodesFilter[operTypeId]) {
+        if (lastMinimal) {
+          return [undefined, true]
+        } else {
+          return [minimalInfoCodesFilter[operTypeId], true]
+        }
+      } else {
+        let name = operName ? operName : operTypeName
+        return [name, false]
+      }
     }
 })()
