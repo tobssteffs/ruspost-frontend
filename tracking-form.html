@@ -1,19 +1,12 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <link rel="stylesheet" href="./tracking-form.css">
+</head>
 <body>
-<div class="tracking-tool-wrapper">
-    <div id="tracking" class="tracking-field-anchor"></div>
-    <div class="pt-wrapper-center">
-        <h2 class="heading-h2 tracking">Sendungsverfolgung</h2>
-        <div class="w-form">
-            <form id="tracking-form" name="tracking-form" data-name="Tracking Form" class="searchbar">
-                <input type="text" class="input-field search w-input" maxlength="256" name="tracking-id" data-name="tracking-id" placeholder="Tracking ID eingeben" id="tracking-search-input" required="">
-                <input type="submit" value="Sendung verfolgen" data-wait="Please wait..." id="tracking-search-btn" class="button tracking w-button">
-            </form>
-        </div>
-        <div id="tracking-search-results"></div>
-    </div>
-</div>
+
+<div id="tracking-form-section" class="section-content tracking"><div class="form-block-2 w-form"><form action="#" name="wf-form-Tracking-Form" data-name="Tracking Form" id="tracking-form" class="searchbar"><input type="text" class="input-field search w-input" maxlength="256" name="tracking-search-input" data-name="tracking-search-input" placeholder="Sendungsnummer eingeben" id="tracking-search-input" required=""><input type="submit" value="Sendung verfolgen" data-wait="Einen Augenblick..." id="tracking-search-btn" data-w-id="deb4121b-c075-6352-a65f-2d99d1fcb012" class="button tracking w-button"></form><div class="w-form-done"><div>Thank you! Your submission has been received!</div></div><div class="w-form-fail"><div>Oops! Something went wrong while submitting the form.</div></div></div></div>
+<div id="tracking-results-section" class="section-content tracking-demo"><div id="loader-container" class="trackingcontainerdetail"><div id="loader"></div></div><div id="tracking-form-fail-container" class="trackingcontainerdetail"><div id="tracking-form-fail-message"></div></div><div id="tracking-container-template" class="trackingcontainerdetail"><div id="tracking-detail-headline" class="textblock-bold">EMS delivery from Омска</div><div id="tracking-detail-subheadline" class="textblocktrackingsmall">RA644000001RU</div><div class="line trackingoutput"></div><div id="tracking-items"><div id="tracking-item-template" class="trackingitem"><div class="trackingiconwrapper"><img src="https://assets.website-files.com/5ef2311c8f2d5d28a241aa82/5fb787fedb3f051ba17f7ccc_tick.svg" loading="lazy" width="32" height="32" id="tracking-item-icon" alt=""></div><div class="trackingtextwrapper"><div id="tracking-item-headline" class="textblocktrackingbig">Arrived at the Post office</div><div id="tracking-item-operation-location" class="textblocktrackingsmall">644001, Omsk<br></div><div id="tracking-item-operation-time" class="textblocktrackingsmall">28 August 2015, 03:00<br></div></div></div></div><div class="line trackingoutput"></div><div class="wrapper-estimated-fee"><div class="textblocktrackingbig">Accrued Fee</div><div class="textblocktrackingbig">7410 ₽</div></div><div class="textblocktrackingsmall">The commission for the transfer of cash on delivery is calculated according to the tariffs. <em>// in welcher Form relevant?</em><br></div><div class="line trackingoutput"></div><div><div id="tracking-detail-bottom-from-info" class="textblocktrackingsmall">From:</div><div id="tracking-detail-bottom-to-info" class="textblocktrackingsmall">To:</div><div id="tracking-detail-bottom-location-info" class="textblocktrackingsmall">Location:</div></div><a href="#" class="trackinghelplink w-inline-block"><div class="trackinghelptext">need help?</div></a></div></div>
 
 <script src="./getTrackingResults.js"></script>
 
