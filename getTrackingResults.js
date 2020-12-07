@@ -29,13 +29,9 @@
 
           const trackingInput = document.getElementById('tracking-search-input')
 
-          const localBaseUrl = 'http://localhost:5000/api/tracking/'
-          const remoteBaseUrl = 'https://ruspost.herokuapp.com/api/tracking/'
-          const isLocalEnv = location.hostname === '' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'
-          const baseUrl = isLocalEnv ? localBaseUrl : remoteBaseUrl
-          const requestUrl = baseUrl + trackingInput.value
           console.log('start request')
-          const response = await fetch(requestUrl, {
+          const url = getRequestUrl();
+          const response = await fetch(url, {
               method: 'GET',
               mode: 'cors',
               cache: 'no-cache',
@@ -128,6 +124,14 @@
           formFailContainer.style.display = 'block'
       }
     })
+
+    function getRequestUrl() {
+      const localBaseUrl = 'http://localhost:5000/api/tracking/';
+      const remoteBaseUrl = 'https://ruspost.herokuapp.com/api/tracking/';
+      const isLocalEnv = location.hostname === '' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      const baseUrl = isLocalEnv ? localBaseUrl : remoteBaseUrl;
+      return baseUrl + trackingInput.value;
+    }
 
     /**
     * Handle the different types of icons to be shown.
