@@ -5,10 +5,9 @@
     event.preventDefault();
     emailForm.checkValidity();
 
+    console.log('Start request');
     const url = getRequestUrl();
-
     const formData = getSerializedJson(emailForm);
-
     const response = await fetch(url, {
       method: 'POST',
       mode: 'cors',
@@ -20,8 +19,10 @@
       },
       body: formData,
     })
-    const resJson = await response.json()
-    console.log('json',resJson)
+    const resJson = await response.json();
+    console.log(resJson);
+
+    displayFeedback(resJson);
   });
 
   function getRequestUrl() {
@@ -43,5 +44,24 @@
         object[key] = value;
     });
     return JSON.stringify(object);
+  }
+
+  function displayFeedback(response) {
+    if (response['error']) {
+      // some kind of a backend error occured
+      const errorContainer = document.getElementById('error-message-container');
+      errorContainer.firstElementChild.innerHTML = response['error'];
+      errorContainer.style.display = 'block';
+    } else if (response['mail_sent'] && response['status_code'] === 200) {
+      // email has been sent out fine
+      const successContainer = document.getElementById('success-message-container');
+      successContainer.firstElementChild.innerHTML = response['message'];
+      successContainer.style.display = 'block';
+    } else {
+      // error sending the email occurred
+      const errorContainer = document.getElementById('error-message-container');
+      errorContainer.firstElementChild.innerHTML = response['message'];
+      errorContainer.style.display = 'block';
+    }
   }
 })()
