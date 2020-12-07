@@ -1,11 +1,13 @@
 (async function homePage() {
   const emailForm = document.getElementById('email-form');
+  const submitButton = document.getElementById('submit-contact-form');
 
   emailForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     emailForm.checkValidity();
 
     console.log('Start request');
+    submitButton.value = 'Wird gesendet...';
     const url = getRequestUrl();
     const formData = getSerializedJson(emailForm);
     const response = await fetch(url, {
@@ -18,9 +20,10 @@
         'Content-Type': 'application/json'
       },
       body: formData,
-    })
+    });
     const resJson = await response.json();
     console.log(resJson);
+    submitButton.value = 'Versandt!';
 
     displayFeedback(resJson);
   });
