@@ -9,24 +9,24 @@
   <div class="form-block w-form">
     <form id="email-form" name="email-form" data-name="Email Form" method="post" action="http://sendForm">
       <div class="div-block-9">
-        <div><label for="first-name">Vorname*</label><input type="text" maxlength="256" name="first-name" data-name="first-name" required="" id="first-name" class="w-input"></div>
+        <div><label for="first-name">Vorname*</label><input value="mac" type="text" maxlength="256" name="first-name" data-name="first-name" required="" id="first-name" class="w-input"></div>
         <div class="spacer-vertically"></div>
-        <div><label for="last-name">Nachname*</label><input type="text" class="w-input" maxlength="256" name="last-name" data-name="last-name" placeholder="" id="last-name" required=""></div>
-      </div><label for="company-2">Unternehmen/Institution</label><input type="text" class="w-input" maxlength="256" name="company" data-name="company" placeholder="" id="company-2"><label for="issue-type">Anliegen*</label><select id="issue-type" name="issue-type" data-name="issue-type" required="" class="select-field w-select">
-      <option value="">Beschreiben Sie Ihr Anliegen</option>
+        <div><label for="last-name">Nachname*</label><input value="stone" type="text" class="w-input" maxlength="256" name="last-name" data-name="last-name" placeholder="" id="last-name" required=""></div>
+      </div><label for="company-2">Unternehmen/Institution</label><input value="richCo" type="text" class="w-input" maxlength="256" name="company" data-name="company" placeholder="" id="company-2"><label for="issue-type">Anliegen*</label><select id="issue-type" name="issue-type" data-name="issue-type" required="" class="select-field w-select">
+      <option value="initial">Beschreiben Sie Ihr Anliegen</option>
       <option value="sales@">Ich plane Neukunde zu werden</option>
       <option value="service@">Ich bin bereits Kunde</option>
       <option value="info@">Ich habe eine allgemeine Frage</option>
       <option value="pr@">Ich habe ein Presserelevantes Anliegen</option>
       <option value="c2c@">Ich bin Privatkunde und habe eine spezielle Frage</option>
       <option value="hr@">Ich möchte mich um eine Stelle bewerben</option>
-    </select><label for="message-2">Nachricht*</label><textarea placeholder="Ihre Nachricht" maxlength="5000" id="message-2" name="message" data-name="message" required="" class="textarea w-input"></textarea>
-      <div class="line contact-form"></div><label for="email-5">Email Addresse*</label><input type="email" class="w-input" maxlength="256" name="email" data-name="email" placeholder="" id="email-5" required=""><label for="phone-3">Telefon</label><input type="tel" class="w-input" maxlength="256" name="phone" data-name="phone" placeholder="" id="phone-3"><label class="w-checkbox"><input type="checkbox" id="GDPR-2" name="GDPR-2" data-name="GDPR 2" required="" class="w-checkbox-input"><span for="GDPR-2" class="checkbox-label w-form-label">I agree that my personal informations will be saved and proceed in terms of the <a href="/de/datenschutzerklarung" id="link" class="textlink-normal">Data Policy</a>.</span></label><input type="submit" value="Absenden" data-wait="Bitte warten" id="submit-contact-form" class="button w-button">
+    </select><label for="message-2">Nachricht*</label><textarea placeholder="Ihre Nachricht" maxlength="5000" id="message-2" name="message" data-name="message" required="" class="textarea w-input">You are doing great!</textarea>
+      <div class="line contact-form"></div><label for="email-5">Email Addresse*</label><input value="huh@puh.de" type="email" class="w-input" maxlength="256" name="email" data-name="email" placeholder="" id="email-5" required=""><label for="phone-3">Telefon</label><input value="0180505015" type="tel" class="w-input" maxlength="256" name="phone" data-name="phone" placeholder="" id="phone-3"><label class="w-checkbox"><input checked type="checkbox" id="GDPR-2" name="GDPR-2" data-name="GDPR 2" required="" class="w-checkbox-input"><span for="GDPR-2" class="checkbox-label w-form-label">I agree that my personal informations will be saved and proceed in terms of the <a href="/de/datenschutzerklarung" id="link" class="textlink-normal">Data Policy</a>.</span></label><input type="submit" value="Absenden" data-wait="Bitte warten" id="submit-contact-form" class="button w-button">
     </form>
-    <div class="success-message w-form-done">
+    <div id="success-message-container" class="success-message w-form-done">
       <div>Costumized Message.</div>
     </div>
-    <div class="w-form-fail">
+    <div id="error-message-container" class="w-form-fail">
       <div>Oops! Something went wrong while submitting the form.</div>
     </div>
   </div>
