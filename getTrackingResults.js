@@ -11,6 +11,7 @@
     const trackingInput = document.getElementById('tracking-search-input');
     // preset tracking ID for testing
     trackingInput.value = 'RA644000005RU';
+    const languageCode = getLanguageCode();
     
     trackingForm.addEventListener("submit", async (event) => {
       try {
@@ -119,12 +120,20 @@
       }
     })
 
+    function getLanguageCode() {
+      // The website is structured with directories for languages in the first
+      // part of the URL path. If no directory is given, then most probably we are at the
+      // homepage, which uses the default language German.
+      const languageDirectory = window.location.pathname.split('/').filter(pathPart => pathPart)[0];
+      return languageDirectory ? languageDirectory : 'de';
+    }
+
     function getRequestUrl() {
-      const localBaseUrl = 'http://localhost:5000/api/tracking/';
-      const remoteBaseUrl = 'https://ruspost.herokuapp.com/api/tracking/';
+      const localBaseUrl = 'http://localhost:5000/api/tracking';
+      const remoteBaseUrl = 'https://ruspost.herokuapp.com/api/tracking';
       const isLocalEnv = location.hostname === '' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
       const baseUrl = isLocalEnv ? localBaseUrl : remoteBaseUrl;
-      return baseUrl + trackingInput.value;
+      return baseUrl + `?tracking_id=${trackingInput.value}&lang_code=${languageCode}`;
     }
 
     /**
