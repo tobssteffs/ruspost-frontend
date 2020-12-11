@@ -33,3 +33,7 @@ be as follows:
 1. You might also want to update the CSS (e.g. `tracking-form.css` is part of 
    `getTrackingResults.js` and also needs to be added to webflow's <head> style section
    of each translated page)
+
+After bringing the code to production, make sure everything works as expected
+on every (translated) page and that there is no console output in the browser
+DevTools related to your work.
