@@ -1,22 +1,22 @@
 (async function homePage() {
     const trackingForm = document.getElementById('tracking-form');
-    console.log(trackingForm);
     const trackingContainerTemplate = document.getElementById('tracking-container-template');
     const formFailContainer = document.getElementById('tracking-form-fail-container');
     let trackingItemTemplate = trackingContainerTemplate.querySelector('#tracking-item-template');
     trackingItemTemplate = trackingItemTemplate.cloneNode(true);
-    console.log('cloned tracking item', trackingItemTemplate);
     const trackingItems = trackingContainerTemplate.querySelector('#tracking-items');
     const loaderContainer = document.getElementById('loader-container');
     const trackingInput = document.getElementById('tracking-search-input');
     // preset tracking ID for testing
     trackingInput.value = 'RA644000005RU';
+    const trackingButton = document.getElementById('tracking-search-btn');
     const userLanguageCode = getLanguageCode();
     
     trackingForm.addEventListener("submit", async (event) => {
       try {
           event.preventDefault();
           trackingForm.checkValidity();
+          trackingButton.disabled = true;
 
           // resets in case there was already a tracking number searched for
           formFailContainer.style.display = 'none';
@@ -120,6 +120,8 @@
           formFailMessage.innerText = 'Unerwarteter Fehler, bitte versuchen Sie es noch einmal, deaktivieren Sie Ihren Adblocker oder wenden sich an den Support.';
           loaderContainer.style.display = 'none';
           formFailContainer.style.display = 'block';
+      } finally {
+        trackingButton.disabled = false;
       }
     })
 
