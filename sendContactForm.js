@@ -1,32 +1,42 @@
 (async function homePage() {
   const emailForm = document.getElementById('email-form');
   const submitButton = document.getElementById('submit-contact-form');
-  const landuageCode = getLanguageCode();
+  const languageCode = getLanguageCode();
 
   emailForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    emailForm.checkValidity();
+    try {
+      event.preventDefault();
+      emailForm.checkValidity();
+      submitButton.disabled = true;
 
-    console.log('Start request');
-    submitButton.value = translation('btnSendingForm', landuageCode);
-    const url = getRequestUrl();
-    const formData = getSerializedFormDataJson();
-    const response = await fetch(url, {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-cache',
-      redirect: 'follow',
-      referrerPolicy: 'no-referrer',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: formData,
-    });
-    const resJson = await response.json();
-    console.log(resJson);
-    submitButton.value = translation('btnFormSent', landuageCode)
+      console.log('Start request');
+      submitButton.value = translations['btnSendingForm'][languageCode];
+      const url = getRequestUrl();
+      const formData = getSerializedFormDataJson();
+      const response = await fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: formData,
+      });
+      const resJson = await response.json();
+      console.log(resJson);
+      submitButton.value = translations['btnFormSent'][languageCode];
 
-    displayFeedback(resJson);
+      displayFeedback(resJson);
+    } catch (e) {
+      const errorContainer = document.getElementById('error-message-container');
+      errorContainer.firstElementChild.innerHTML = translations['unexpectedError'][languageCode];
+      submitButton.value = translations['btnSendingFailed'][languageCode];
+      errorContainer.style.display = 'block';
+    } finally {
+      submitButton.disabled = false;
+    }
   });
 
   function getLanguageCode() {
@@ -59,7 +69,7 @@
     const formData = new FormData(emailForm);
 
     // Add language code.
-    formData.append('lang-code', landuageCode)
+    formData.append('lang-code', languageCode)
 
     if (formData.get('issue-type') === null) {
       // Add issue-type manually to determine a target address since it's not
@@ -94,23 +104,28 @@
     }
   }
 
-  function translation(type, langCode) {
-    console.log('type', type)
-    console.log('code', langCode)
-
-    const translations = {
-      'btnSendingForm': {
-        'de': 'Wird versendet...',
-        'en': 'Sending form...',
-        'ru': 'Высылается...'
-      },
-      'btnFormSent': {
-        'de': 'Versandt!',
-        'en': 'Sent!',
-        'ru': 'Выслано!'
-      }
+  // Some translations are just javascript specific and are not to be gotten
+  // form the API.
+  const translations = {
+    'btnSendingForm': {
+      'de': 'Wird versendet...',
+      'en': 'Sending form...',
+      'ru': 'Высылается...'
+    },
+    'btnFormSent': {
+      'de': 'Versandt!',
+      'en': 'Sent!',
+      'ru': 'Выслано!'
+    },
+    'btnSendingFailed': {
+      'de': 'Nochmal versuchen',
+      'en': 'Try again',
+      'ru': 'Выслать ещё раз'
+    },
+    'unexpectedError': {
+      'de': 'Unerwarteter Fehler, bitte versuchen Sie es noch einmal, deaktivieren Sie Ihren Adblocker oder wenden sich an den Support.',
+      'en': 'Unexpected Error, please try again or contact the support.',
+      'ru': 'Неожиданная ошибка, пожалуйста попробуйте ещё раз или обратитесь в поддержку.'
     }
-
-    return translations[type][langCode];
   }
 })()
