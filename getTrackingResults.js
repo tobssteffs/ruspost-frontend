@@ -11,7 +11,7 @@
     const trackingInput = document.getElementById('tracking-search-input');
     // preset tracking ID for testing
     trackingInput.value = 'RA644000005RU';
-    const languageCode = getLanguageCode();
+    const userLanguageCode = getLanguageCode();
     
     trackingForm.addEventListener("submit", async (event) => {
       try {
@@ -50,17 +50,20 @@
               * The Client should interprete such attribute value as the absence of information on the attribute.
               * This rule has only one exception: operation 8 (processing), which has attribute 0 (Sorting) as normal.
               */
-              const deliveryToCountry = trackingOperations[0]['address_parameters']['MailDirect']['NameEN'];
+
+              // Get language code for retrieval of the API response's attribute keys.
+              const apiLanguageCode = userLanguageCode === 'ru' ? 'RU' : 'EN';
+              const deliveryToCountry = trackingOperations[0]['address_parameters']['MailDirect'][`Name${apiLanguageCode}`];
               const deliveryToAddress = trackingOperations[0]['address_parameters']['DestinationAddress']['Description'];
-              const deliveryFromCountry = trackingOperations[0]['address_parameters']['CountryOper']['NameEN'];
+              const deliveryFromCountry = trackingOperations[0]['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
               const deliveryFromAddress = trackingOperations[0]['address_parameters']['OperationAddress']['Description'];
-              const currentLocationCountry = trackingOperations[trackingOperations.length - 1]['address_parameters']['CountryOper']['NameEN'];
+              const currentLocationCountry = trackingOperations[trackingOperations.length - 1]['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
               // set general info
               trackingContainerTemplate.querySelector('#tracking-detail-headline').innerText = `Delivery from ${deliveryFromCountry} to ${deliveryToCountry}`;
               trackingContainerTemplate.querySelector('#tracking-detail-subheadline').innerText = trackingInput.value;
-              trackingContainerTemplate.querySelector('#tracking-detail-bottom-from-info').innerText = `From: ${[deliveryFromCountry, deliveryFromAddress].filter(val => val).join(', ')}`;
-              trackingContainerTemplate.querySelector('#tracking-detail-bottom-to-info').innerText = `To: ${[deliveryToCountry, deliveryToAddress].filter(val => val).join(', ')}`;
-              trackingContainerTemplate.querySelector('#tracking-detail-bottom-location-info').innerText = `Current location: ${currentLocationCountry}`;
+              trackingContainerTemplate.querySelector('#origin-location').innerText = `${[deliveryFromCountry, deliveryFromAddress].filter(val => val).join(', ')}`;
+              trackingContainerTemplate.querySelector('#destination-location').innerText = `${[deliveryToCountry, deliveryToAddress].filter(val => val).join(', ')}`;
+              trackingContainerTemplate.querySelector('#current-location').innerText = `${currentLocationCountry}`;
 
               // set tracking items
               let lastWasMinimalInfo = false;
@@ -69,7 +72,7 @@
 
                 console.log(operation);
 
-                const operationCountry = operation['address_parameters']['CountryOper']['NameEN'];
+                const operationCountry = operation['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
                 const operationAddress = operation['address_parameters']['OperationAddress']['Description'];
                 const formattedDateTime = getFormattedDate(operation['operation_parameters']['OperDate']);
                 const operationName = operation['operation_parameters']['OperAttr']['Name'];
@@ -91,7 +94,7 @@
                   continue;
                 }
                 newTrackingItem.querySelector('#tracking-item-operation-location').innerText = `${[operationCountry, operationAddress].filter(val => val).join(', ')}`;
-                newTrackingItem.querySelector('#tracking-item-operation-time').innerText = formattedDateTime + " - code: " + operationTypeId;
+                newTrackingItem.querySelector('#tracking-item-operation-time').innerText = formattedDateTime;
 
                 trackingItems.appendChild(newTrackingItem);
               }
@@ -133,7 +136,7 @@
       const remoteBaseUrl = 'https://ruspost.herokuapp.com/api/tracking';
       const isLocalEnv = location.hostname === '' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
       const baseUrl = isLocalEnv ? localBaseUrl : remoteBaseUrl;
-      return baseUrl + `?tracking_id=${trackingInput.value}&lang_code=${languageCode}`;
+      return baseUrl + `?tracking_id=${trackingInput.value}&lang_code=${userLanguageCode}`;
     }
 
     /**
