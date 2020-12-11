@@ -1,10 +1,18 @@
 /**
-* Custom Tracking API CSS
+* CSS for local tests - don't add this to production environments!
 */
 
 #tracking-container-template {
     display: none;
 }
+
+/**
+* END OF CSS for local tests - don't add this to production environments!
+*/
+
+/**
+* Custom Tracking API CSS
+*/
 
 #tracking-item-template {
     display: none;
@@ -32,5 +40,5 @@
 }
 
 /**
-* End of Custom Tracking API CSS
+* END OF Custom Tracking API CSS
 */
