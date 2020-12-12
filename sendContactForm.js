@@ -35,7 +35,7 @@
       submitButton.value = translations['btnSendingFailed'][languageCode];
       errorContainer.style.display = 'block';
     } finally {
-      submitButton.disabled = false;
+      submitButton.style.display = 'none';
     }
   });
 
