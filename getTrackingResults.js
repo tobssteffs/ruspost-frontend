@@ -7,8 +7,6 @@
   const trackingItems = trackingContainerTemplate.querySelector('#tracking-items');
   const loaderContainer = document.getElementById('loader-container');
   const trackingInput = document.getElementById('tracking-search-input');
-  // preset tracking ID for testing
-  trackingInput.value = 'RA644000005RU';
   const trackingButton = document.getElementById('tracking-search-btn');
   const userLanguageCode = getLanguageCode();
 
