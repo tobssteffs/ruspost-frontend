@@ -34,11 +34,11 @@
           redirect: 'follow',
           referrerPolicy: 'no-referrer',
       });
-      const resJson = await response.json();
+      const data = await response.json();
       console.log('res', response);
-      console.log('json',resJson);
+      console.log('json',data);
 
-      const trackingOperations = resJson.tracking_operations;
+      const trackingOperations = data.tracking_operations;
       if (Array.isArray(trackingOperations) && trackingOperations.length) {
         /** Handle Russian Post Tracking API operation details:
         *
@@ -60,7 +60,7 @@
         const deliveryFromAddress = trackingOperations[0]['address_parameters']['OperationAddress']['Description'];
         const currentLocationCountry = trackingOperations[trackingOperations.length - 1]['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
         // set general info
-        trackingContainerTemplate.querySelector('#tracking-detail-headline').innerText = `Delivery from ${deliveryFromCountry} to ${deliveryToCountry}`;
+        trackingContainerTemplate.querySelector('#tracking-detail-headline').innerText = `${data.headline} ${deliveryFromCountry} - ${deliveryToCountry}`;
         trackingContainerTemplate.querySelector('#tracking-detail-subheadline').innerText = trackingInput.value;
         trackingContainerTemplate.querySelector('#origin-location').innerText = `${[deliveryFromCountry, deliveryFromAddress].filter(val => val).join(', ')}`;
         trackingContainerTemplate.querySelector('#destination-location').innerText = `${[deliveryToCountry, deliveryToAddress].filter(val => val).join(', ')}`;
@@ -104,11 +104,11 @@
         trackingContainerTemplate.style.display = 'block';
 
         console.log('success');
-      } else if (resJson.error) {
-        console.error('error json', resJson.error);
+      } else if (data.error) {
+        console.error('error json', data.error);
         const formFailMessage = document.getElementById('tracking-form-fail-message');
 
-        formFailMessage.innerText = resJson.error;
+        formFailMessage.innerText = data.error;
         loaderContainer.style.display = 'none';
         formFailContainer.style.display = 'block';
       }
