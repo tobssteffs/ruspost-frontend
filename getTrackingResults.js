@@ -57,7 +57,13 @@
         const lastTrackingOperationsIndex = trackingOperations.length - 1;
         const deliveryToCountry = trackingOperations[lastTrackingOperationsIndex]['address_parameters']['MailDirect'][`Name${apiLanguageCode}`];
         const deliveryToAddress = removeNonLetterCharacters(trackingOperations[lastTrackingOperationsIndex]['address_parameters']['DestinationAddress']['Description']);
-        const deliveryFromCountry = trackingOperations[lastTrackingOperationsIndex]['address_parameters']['CountryFrom'][`Name${apiLanguageCode}`];
+        let deliveryFromCountry;
+        // TODO: Add function for this.
+        if (trackingOperations[lastTrackingOperationsIndex]['address_parameters']['CountryFrom']) {
+          deliveryFromCountry = trackingOperations[lastTrackingOperationsIndex]['address_parameters']['CountryFrom'][`Name${apiLanguageCode}`];
+        } else {
+          deliveryFromCountry = trackingOperations[0]['address_parameters']['CountryFrom'][`Name${apiLanguageCode}`];
+        }
         const deliveryFromAddress = removeNonLetterCharacters(trackingOperations[lastTrackingOperationsIndex]['address_parameters']['OperationAddress']['Description']);
         // Current operation is located in the very beginning of the array, since the sort order is reversed.
         const currentLocationCountry = trackingOperations[0]['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
