@@ -52,11 +52,15 @@
         // Get language code for retrieval of the API response's attribute keys.
         const apiLanguageCode = userLanguageCode === 'ru' ? 'RU' : 'EN';
         // Get general API information
-        const deliveryToCountry = trackingOperations[0]['address_parameters']['MailDirect'][`Name${apiLanguageCode}`];
-        const deliveryToAddress = trackingOperations[0]['address_parameters']['DestinationAddress']['Description'];
-        const deliveryFromCountry = trackingOperations[0]['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
-        const deliveryFromAddress = trackingOperations[0]['address_parameters']['OperationAddress']['Description'];
-        const currentLocationCountry = trackingOperations[trackingOperations.length - 1]['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
+        // TODO: Stop depending on the order of the operations somehow.
+        // Get the general information from the very first operation.
+        const lastTrackingOperationsIndex = trackingOperations.length - 1;
+        const deliveryToCountry = trackingOperations[lastTrackingOperationsIndex]['address_parameters']['MailDirect'][`Name${apiLanguageCode}`];
+        const deliveryToAddress = removeNonLetterCharacters(trackingOperations[lastTrackingOperationsIndex]['address_parameters']['DestinationAddress']['Description']);
+        const deliveryFromCountry = trackingOperations[lastTrackingOperationsIndex]['address_parameters']['CountryFrom'][`Name${apiLanguageCode}`];
+        const deliveryFromAddress = removeNonLetterCharacters(trackingOperations[lastTrackingOperationsIndex]['address_parameters']['OperationAddress']['Description']);
+        // Current operation is located in the very beginning of the array, since the sort order is reversed.
+        const currentLocationCountry = trackingOperations[0]['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
         // set general info
         trackingContainerTemplate.querySelector('#tracking-detail-headline').innerText = `${data.headline} ${deliveryFromCountry} - ${deliveryToCountry}`;
         trackingContainerTemplate.querySelector('#tracking-detail-subheadline').innerText = trackingInput.value;
@@ -70,7 +74,7 @@
           // Only set tracking item if the operation type name is available.
           if (!operationName) { continue; }
           const operationCountry = operation['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
-          const operationAddress = operation['address_parameters']['OperationAddress']['Description'];
+          const operationAddress = removeNonLetterCharacters(operation['address_parameters']['OperationAddress']['Description']);
           const formattedDateTime = getFormattedDate(operation['operation_parameters']['OperDate']);
           const operationTypeName = operation['operation_parameters']['OperType']['Name'];
           const operationTypeId = operation['operation_parameters']['OperType']['Id'];
@@ -158,6 +162,11 @@
     const month = (operationDate.getMonth() < 10? '0' : '') + operationDate.getMonth();
     const formattedDate = `${day}.${month}.${operationDate.getFullYear()}`;
     return `${formattedDate}, ${operationDate.toTimeString().substr(0,5)}`;
+  }
+  function removeNonLetterCharacters(operAddr) {
+    if (!operAddr) { return operAddr; }
+    const newOperAddr = operAddr.replace(/[^a-zA-Z ]/g, "");
+    return newOperAddr;
   }
 
   /**
