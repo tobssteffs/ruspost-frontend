@@ -65,33 +65,21 @@
         trackingContainerTemplate.querySelector('#current-location').innerText = `${currentLocationCountry}`;
 
         // set tracking items
-        let lastWasMinimalInfo = false;
         for (const operation of trackingOperations) {
-          const newTrackingItem = trackingItemTemplate.cloneNode(deep=true);
-
-          console.log(operation);
-
+          const operationName = operation['operation_parameters']['OperAttr']['Name'];
+          // Only set tracking item if the operation type name is available.
+          if (!operationName) { continue; }
           const operationCountry = operation['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
           const operationAddress = operation['address_parameters']['OperationAddress']['Description'];
           const formattedDateTime = getFormattedDate(operation['operation_parameters']['OperDate']);
-          const operationName = operation['operation_parameters']['OperAttr']['Name'];
-          const operationTypeId = operation['operation_parameters']['OperType']['Id'];
           const operationTypeName = operation['operation_parameters']['OperType']['Name'];
+          const operationTypeId = operation['operation_parameters']['OperType']['Id'];
 
+          const newTrackingItem = trackingItemTemplate.cloneNode(deep=true);
           newTrackingItem.removeAttribute('id');
           newTrackingItem.querySelector('#tracking-item-icon').src = getIconUrl(operationTypeId);
-          let headline, newLastMinimal;
-          [headline, newLastMinimal] = getTrackingItemHeadline(operationTypeId, lastWasMinimalInfo, operationTypeName, operationName);
-          if (headline && !lastWasMinimalInfo && lastWasMinimalInfo !== newLastMinimal) {
-            lastWasMinimalInfo = newLastMinimal;
-            newTrackingItem.querySelector('#tracking-item-headline').innerText = headline;
-          } else if (headline && !newLastMinimal) {
-            lastWasMinimalInfo = newLastMinimal;
-            newTrackingItem.querySelector('#tracking-item-headline').innerText = headline;
-          } else {
-            lastWasMinimalInfo = newLastMinimal;
-            continue;
-          }
+
+          newTrackingItem.querySelector('#tracking-item-headline').innerText = operationName;
           newTrackingItem.querySelector('#tracking-item-operation-location').innerText = `${[operationCountry, operationAddress].filter(val => val).join(', ')}`;
           newTrackingItem.querySelector('#tracking-item-operation-time').innerText = formattedDateTime;
 
@@ -170,26 +158,6 @@
     const month = (operationDate.getMonth() < 10? '0' : '') + operationDate.getMonth();
     const formattedDate = `${day}.${month}.${operationDate.getFullYear()}`;
     return `${formattedDate}, ${operationDate.toTimeString().substr(0,5)}`;
-  }
-
-  const minimalInfoCodesFilter = {
-    8: 'In transit to the next station',
-    9: 'In transit to the next station',
-    10: 'In transit to the next station',
-    11: 'In transit to the next station',
-    14: 'In transit to the next station'
-  }
-  function getTrackingItemHeadline(operTypeId, lastMinimal, operTypeName, operName) {
-    if (minimalInfoCodesFilter[operTypeId]) {
-      if (lastMinimal) {
-        return [undefined, true];
-      } else {
-        return [minimalInfoCodesFilter[operTypeId], true];
-      }
-    } else {
-      let name = operName ? operName : operTypeName;
-      return [name, false];
-    }
   }
 
   /**
