@@ -76,20 +76,22 @@
 
         // set tracking items
         for (const operation of trackingOperations) {
-          const operationName = operation['operation_parameters']['OperAttr']['Name'];
+          const operationTypeId = operation['operation_parameters']['OperType']['Id'];
+          const operationAttrId = operation['operation_parameters']['OperAttr']['Id'];
+          if (isFilteredAttribute(operationTypeId, operationAttrId)) { continue; }
+          const operationTypeName = operation['operation_parameters']['OperType']['Name'];
+          const operationAttrName = operation['operation_parameters']['OperAttr']['Name'];
           // Only set tracking item if the operation type name is available.
-          if (!operationName) { continue; }
+          if (!operationAttrName) { continue; }
           const operationCountry = operation['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
           const operationAddress = removeNonLetterCharacters(operation['address_parameters']['OperationAddress']['Description']);
           const formattedDateTime = getFormattedDate(operation['operation_parameters']['OperDate']);
-          const operationTypeName = operation['operation_parameters']['OperType']['Name'];
-          const operationTypeId = operation['operation_parameters']['OperType']['Id'];
 
           const newTrackingItem = trackingItemTemplate.cloneNode(deep=true);
           newTrackingItem.removeAttribute('id');
           newTrackingItem.querySelector('#tracking-item-icon').src = getIconUrl(operationTypeId);
 
-          newTrackingItem.querySelector('#tracking-item-headline').innerText = operationName;
+          newTrackingItem.querySelector('#tracking-item-headline').innerText = operationAttrName;
           newTrackingItem.querySelector('#tracking-item-operation-location').innerText = `${[operationCountry, operationAddress].filter(val => val).join(', ')}`;
           newTrackingItem.querySelector('#tracking-item-operation-time').innerText = formattedDateTime;
 
@@ -169,10 +171,28 @@
     const formattedDate = `${day}.${month}.${operationDate.getFullYear()}`;
     return `${formattedDate}, ${operationDate.toTimeString().substr(0,5)}`;
   }
-  function removeNonLetterCharacters(operAddr) {
-    if (!operAddr) { return operAddr; }
-    const newOperAddr = operAddr.replace(/[^a-zA-Z ]/g, "");
-    return newOperAddr;
+
+  function getUserFriendlyAddress(addr) {
+    let friendlyAddr = removeNonLetterCharacters(addr);
+    return friendlyAddr;
+  }
+  function removeNonLetterCharacters(addr) {
+    if (!addr) { return addr; }
+    const newAddr = addr.replace(/[^a-zA-Z ]/g, "");
+    return newAddr;
+  }
+
+  // Codes of attribute names to be filtered, i.e not to be displayed.
+  const filteredAttributeNameCodes = {
+    8: [0],
+  }
+  function isFilteredAttribute(operCode, attrCode) {
+    if (filteredAttributeNameCodes[operCode]) {
+      if (filteredAttributeNameCodes[operCode].includes(attrCode)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
