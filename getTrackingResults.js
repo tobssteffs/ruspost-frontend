@@ -56,7 +56,7 @@
         // Get the general information from the very first operation.
         const lastTrackingOperationsIndex = trackingOperations.length - 1;
         const deliveryToCountry = trackingOperations[lastTrackingOperationsIndex]['address_parameters']['MailDirect'][`Name${apiLanguageCode}`];
-        const deliveryToAddress = removeNonLetterCharacters(trackingOperations[lastTrackingOperationsIndex]['address_parameters']['DestinationAddress']['Description']);
+        const deliveryToAddress = getUserFriendlyAddress(trackingOperations[lastTrackingOperationsIndex]['address_parameters']['DestinationAddress']['Description']);
         let deliveryFromCountry;
         // TODO: Add function for this.
         if (trackingOperations[lastTrackingOperationsIndex]['address_parameters']['CountryFrom']) {
@@ -64,7 +64,7 @@
         } else {
           deliveryFromCountry = trackingOperations[0]['address_parameters']['CountryFrom'][`Name${apiLanguageCode}`];
         }
-        const deliveryFromAddress = removeNonLetterCharacters(trackingOperations[lastTrackingOperationsIndex]['address_parameters']['OperationAddress']['Description']);
+        const deliveryFromAddress = getUserFriendlyAddress(trackingOperations[lastTrackingOperationsIndex]['address_parameters']['OperationAddress']['Description']);
         // Current operation is located in the very beginning of the array, since the sort order is reversed.
         const currentLocationCountry = trackingOperations[0]['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
         // set general info
@@ -84,7 +84,7 @@
           // Only set tracking item if the operation type name is available.
           if (!operationAttrName) { continue; }
           const operationCountry = operation['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
-          const operationAddress = removeNonLetterCharacters(operation['address_parameters']['OperationAddress']['Description']);
+          const operationAddress = getUserFriendlyAddress(operation['address_parameters']['OperationAddress']['Description']);
           const formattedDateTime = getFormattedDate(operation['operation_parameters']['OperDate']);
 
           const newTrackingItem = trackingItemTemplate.cloneNode(deep=true);
@@ -174,11 +174,25 @@
 
   function getUserFriendlyAddress(addr) {
     let friendlyAddr = removeNonLetterCharacters(addr);
+    friendlyAddr = removeShortWords(friendlyAddr);
+    friendlyAddr = removeAllCAPS(friendlyAddr);
     return friendlyAddr;
   }
+  // Numbers shouldn't be part of the address.
   function removeNonLetterCharacters(addr) {
     if (!addr) { return addr; }
-    const newAddr = addr.replace(/[^a-zA-Z ]/g, "");
+    const newAddr = addr.replace(/[^a-zA-Z ]/g, '');
+    return newAddr;
+  }
+  // Short words like Cp or cex don't help the user.
+  function removeShortWords(addr) {
+    if (!addr) { return addr; }
+    return addr.split(' ').filter(word => word.length > 3).join(' ');
+  }
+  // All capital letter words seem to be internal organization abbreviations.
+  function removeAllCAPS(addr) {
+    if (!addr) { return addr; }
+    const newAddr = addr.replace(/(\b[A-Z0-9]['A-Z0-9]+|\b[A-Z]\b)/g, '');
     return newAddr;
   }
 
