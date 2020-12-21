@@ -74,7 +74,6 @@
         for (const operation of trackingOperations) {
           const operationTypeId = operation['operation_parameters']['OperType']['Id'];
           const operationAttrId = operation['operation_parameters']['OperAttr']['Id'];
-          if (isFilteredAttribute(operationTypeId, operationAttrId)) { continue; }
           const operationTypeName = operation['operation_parameters']['OperType']['Name'];
           const operationAttrName = operation['operation_parameters']['OperAttr']['Name'];
           // Only set tracking item if the operation type name is available.
@@ -191,19 +190,6 @@
     if (!addr) { return addr; }
     const newAddr = addr.replace(/(\b[A-Z0-9]['A-Z0-9]+|\b[A-Z]\b)/g, '');
     return newAddr;
-  }
-
-  // Codes of attribute names to be filtered, i.e not to be displayed.
-  const filteredAttributeNameCodes = {
-    8: [0],
-  }
-  function isFilteredAttribute(operCode, attrCode) {
-    if (filteredAttributeNameCodes[operCode]) {
-      if (filteredAttributeNameCodes[operCode].includes(attrCode)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
