@@ -72,15 +72,16 @@
 
         // set tracking items
         for (const operation of trackingOperations) {
+          // As of the specification, OperType and OperAttr ought to be always present.
           const operationTypeId = operation['operation_parameters']['OperType']['Id'];
-          const operationAttrId = operation['operation_parameters']['OperAttr']['Id'];
           const operationTypeName = operation['operation_parameters']['OperType']['Name'];
+          const operationAttrId = operation['operation_parameters']['OperAttr']['Id'];
           const operationAttrName = operation['operation_parameters']['OperAttr']['Name'];
-          // Only set tracking item if the operation type name is available.
+          // Still, the name of OperAttr can be missing. Only set tracking item if the operation type name is available.
           if (!operationAttrName) { continue; }
-          const operationCountry = operation['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
-          const operationAddress = getUserFriendlyAddress(operation['address_parameters']['OperationAddress']['Description']);
-          const formattedDateTime = getFormattedDate(operation['operation_parameters']['OperDate']);
+          const operationCountry = getSafeDouble(operation['address_parameters'], 'CountryOper', `Name${apiLanguageCode}`);
+          const operationAddress = getUserFriendlyAddress(getSafeDouble(operation['address_parameters'], 'OperationAddress', 'Description'));
+          const formattedDateTime = getFormattedDate(getSafeSingle(operation['operation_parameters'], 'OperDate'));
 
           const newTrackingItem = trackingItemTemplate.cloneNode(deep=true);
           newTrackingItem.removeAttribute('id');
@@ -158,6 +159,7 @@
     return operationTypeIdToIconUrlMapping[operTypeId] ? operationTypeIdToIconUrlMapping[operTypeId] : packageIconUrl;
   }
   function getFormattedDate(date) {
+    if (date === getSafeDefault || !date) return getSafeDefault
     let operationDate = new Date(date);
     const day = (operationDate.getDate() < 10? '0' : '') + operationDate.getDate();
     const month = (operationDate.getMonth() < 10? '0' : '') + operationDate.getMonth();
