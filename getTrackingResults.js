@@ -9,6 +9,7 @@
   const trackingInput = document.getElementById('tracking-search-input');
   const trackingButton = document.getElementById('tracking-search-btn');
   const userLanguageCode = getLanguageCode();
+  const getSafeDefault = '';
 
   trackingForm.addEventListener("submit", async (event) => {
     try {
@@ -23,7 +24,7 @@
 
       loaderContainer.style.display = 'flex';
 
-      console.log('start request');
+      console.log('Start request');
       const url = getRequestUrl();
       const response = await fetch(url, {
           method: 'GET',
@@ -33,8 +34,6 @@
           referrerPolicy: 'no-referrer',
       });
       const data = await response.json();
-      console.log('res', response);
-      console.log('json',data);
 
       const trackingOperations = data.tracking_operations;
       if (Array.isArray(trackingOperations) && trackingOperations.length) {
@@ -55,19 +54,16 @@
         // TODO: Stop depending on the order of the operations somehow.
         // Get the general information from the very first operation.
         const lastTrackingOperationsIndex = trackingOperations.length - 1;
-        const deliveryToCountry = trackingOperations[lastTrackingOperationsIndex]['address_parameters']['MailDirect'][`Name${apiLanguageCode}`];
-        const deliveryToAddress = getUserFriendlyAddress(trackingOperations[lastTrackingOperationsIndex]['address_parameters']['DestinationAddress']['Description']);
-        let deliveryFromCountry;
-        // TODO: Add function for this.
-        if (trackingOperations[lastTrackingOperationsIndex]['address_parameters']['CountryFrom']) {
-          deliveryFromCountry = trackingOperations[lastTrackingOperationsIndex]['address_parameters']['CountryFrom'][`Name${apiLanguageCode}`];
-        } else {
-          deliveryFromCountry = trackingOperations[0]['address_parameters']['CountryFrom'][`Name${apiLanguageCode}`];
-        }
-        const deliveryFromAddress = getUserFriendlyAddress(trackingOperations[lastTrackingOperationsIndex]['address_parameters']['OperationAddress']['Description']);
+        const lastOperation = trackingOperations[lastTrackingOperationsIndex];
+        const mostRecentOperation = trackingOperations[0];
+
+        const deliveryToCountry = getSafeTriple(lastOperation, 'address_parameters', 'MailDirect', `Name${apiLanguageCode}`);
+        const deliveryToAddress = getUserFriendlyAddress(getSafeTriple(lastOperation, 'address_parameters', 'DestinationAddress', 'Description'));
+        const deliveryFromCountry = getSafeTriple(lastOperation, 'address_parameters', 'CountryFrom', `Name${apiLanguageCode}`)
+        const deliveryFromAddress = getUserFriendlyAddress(getSafeTriple(lastOperation, 'address_parameters', 'OperationAddress', 'Description'));
         // Current operation is located in the very beginning of the array, since the sort order is reversed.
-        const currentLocationCountry = trackingOperations[0]['address_parameters']['CountryOper'][`Name${apiLanguageCode}`];
-        // set general info
+        const currentLocationCountry = getSafeTriple(mostRecentOperation, 'address_parameters', 'CountryOper', `Name${apiLanguageCode}`);
+        // Set general info
         trackingContainerTemplate.querySelector('#tracking-detail-headline').innerText = `${data.headline} ${deliveryFromCountry} - ${deliveryToCountry}`;
         trackingContainerTemplate.querySelector('#tracking-detail-subheadline').innerText = trackingInput.value;
         trackingContainerTemplate.querySelector('#origin-location').innerText = `${[deliveryFromCountry, deliveryFromAddress].filter(val => val).join(', ')}`;
@@ -100,8 +96,6 @@
 
         loaderContainer.style.display = 'none';
         trackingContainerTemplate.style.display = 'block';
-
-        console.log('success');
       } else if (data.error) {
         console.error('error json', data.error);
         const formFailMessage = document.getElementById('tracking-form-fail-message');
@@ -173,6 +167,9 @@
   }
 
   function getUserFriendlyAddress(addr) {
+    // Default if addr is blank or
+    if (addr === getSafeDefault || !addr) return getSafeDefault;
+
     let friendlyAddr = removeNonLetterCharacters(addr);
     friendlyAddr = removeShortWords(friendlyAddr);
     friendlyAddr = removeAllCAPS(friendlyAddr);
@@ -207,6 +204,34 @@
       }
     }
     return false;
+  }
+
+  /**
+  * Avoid errors when item keys are accessed that do not exist.
+  */
+  function getSafeTriple(item, key1, key2, key3) {
+    try {
+        const value = item[key1][key2][key3];
+        return value ? value : getSafeDefault;
+    } catch(e) {
+        return getSafeDefault;
+    }
+  }
+  function getSafeDouble(item, key1, key2) {
+    try {
+        const value = item[key1][key2];
+        return value ? value : getSafeDefault;
+    } catch(e) {
+        return getSafeDefault;
+    }
+  }
+  function getSafeSingle(item, key1) {
+    try {
+        const value = item[key1];
+        return value ? value : getSafeDefault;
+    } catch(e) {
+        return getSafeDefault;
+    }
   }
 
   /**
