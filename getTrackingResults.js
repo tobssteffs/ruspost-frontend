@@ -97,7 +97,7 @@
         loaderContainer.style.display = 'none';
         trackingContainerTemplate.style.display = 'block';
       } else if (data.error) {
-        console.error('error json', data.error);
+        console.error('error', data.error);
         const formFailMessage = document.getElementById('tracking-form-fail-message');
 
         formFailMessage.innerText = data.error;
@@ -171,15 +171,16 @@
     // Default if addr is blank or
     if (addr === getSafeDefault || !addr) return getSafeDefault;
 
-    let friendlyAddr = removeNonLetterCharacters(addr);
+    let friendlyAddr = removeDigits(addr);
     friendlyAddr = removeShortWords(friendlyAddr);
     friendlyAddr = removeAllCAPS(friendlyAddr);
+    friendlyAddr = removeNonLetterDanglingChars(friendlyAddr);
     return friendlyAddr;
   }
   // Numbers shouldn't be part of the address.
-  function removeNonLetterCharacters(addr) {
+  function removeDigits(addr) {
     if (!addr) { return addr; }
-    const newAddr = addr.replace(/[^a-zA-Z ]/g, '');
+    const newAddr = addr.replace(/[0-9]/g, '');
     return newAddr;
   }
   // Short words like Cp or cex don't help the user.
@@ -192,6 +193,19 @@
     if (!addr) { return addr; }
     const newAddr = addr.replace(/(\b[A-Z0-9]['A-Z0-9]+|\b[A-Z]\b)/g, '');
     return newAddr;
+  }
+  // Sometimes after the removals some dangling special chars are present.
+  function removeNonLetterDanglingChars(addr) {
+    if (!addr) { return addr; }
+    const newAddr = addr.split('');
+    for (var i = newAddr.length - 1; i >= 0; i--) {
+      if (newAddr[i].match(/[a-z]/i)) {
+        break;
+      } else {
+        newAddr.pop();
+      }
+    }
+    return newAddr.join('');
   }
 
   /**
