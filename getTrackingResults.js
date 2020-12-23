@@ -172,9 +172,9 @@
     if (addr === getSafeDefault || !addr) return getSafeDefault;
 
     let friendlyAddr = removeDigits(addr);
-    friendlyAddr = removeShortWords(friendlyAddr);
     friendlyAddr = removeAllCAPS(friendlyAddr);
     friendlyAddr = removeNonLetterDanglingChars(friendlyAddr);
+    friendlyAddr = removeShortWords(friendlyAddr);
     return friendlyAddr;
   }
   // Numbers shouldn't be part of the address.
