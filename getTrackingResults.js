@@ -179,27 +179,27 @@
   }
   // Numbers shouldn't be part of the address.
   function removeDigits(addr) {
-    if (!addr) { return addr; }
     const newAddr = addr.replace(/[0-9]/g, '');
     return newAddr;
   }
   // Short words like Cp or cex don't help the user.
   function removeShortWords(addr) {
-    if (!addr) { return addr; }
     return addr.split(' ').filter(word => word.length > 3).join(' ');
   }
   // All capital letter words seem to be internal organization abbreviations.
   function removeAllCAPS(addr) {
-    if (!addr) { return addr; }
-    const newAddr = addr.replace(/(\b[A-Z0-9]['A-Z0-9]+|\b[A-Z]\b)/g, '');
+    // \u0410-\u042F is unicode for the first and last capital letters in the cyrillic alphabet.
+    // \u0401 is russian Ё
+    const newAddr = addr.replace(/[A-Z\u0410-\u042F\u0401]+[-`' A-Z\u0410-\u042F\u0401]/g, '');
     return newAddr;
   }
   // Sometimes after the removals some dangling special chars are present.
   function removeNonLetterDanglingChars(addr) {
-    if (!addr) { return addr; }
     const newAddr = addr.split('');
     for (var i = newAddr.length - 1; i >= 0; i--) {
-      if (newAddr[i].match(/[a-z]/i)) {
+      // \u0430-\u044f is unicode for the first and last small letters in the cyrillic alphabet.
+      // \u0451 is russian ё
+      if (newAddr[i].match(/[a-z\u0430-\u044f\u0451]/i)) {
         break;
       } else {
         newAddr.pop();
