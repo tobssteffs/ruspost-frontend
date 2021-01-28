@@ -161,8 +161,8 @@
   function getFormattedDate(date) {
     if (date === getSafeDefault || !date) return getSafeDefault
     let operationDate = new Date(date);
-    const day = (operationDate.getDate() < 10? '0' : '') + operationDate.getDate();
-    const month = (operationDate.getMonth() < 10? '0' : '') + operationDate.getMonth();
+    const day = ('0' + operationDate.getDate()).slice(-2)
+    const month = ('0' + (operationDate.getMonth() + 1)).slice(-2)
     const formattedDate = `${day}.${month}.${operationDate.getFullYear()}`;
     return `${formattedDate}, ${operationDate.toTimeString().substr(0,5)}`;
   }
