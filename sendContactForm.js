@@ -59,7 +59,7 @@
 
   function getRequestUrl() {
     const localBaseUrl = 'http://localhost:5000/api/contact_form';
-    const remoteBaseUrl = 'https://ruspost.herokuapp.com/api/contact_form';
+    const remoteBaseUrl = 'https://ruspost-eu.herokuapp.com/api/contact_form';
     const isLocalEnv = location.hostname === '' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
     const baseUrl = isLocalEnv ? localBaseUrl : remoteBaseUrl;
     return baseUrl;
